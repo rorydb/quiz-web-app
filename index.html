@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en_US">
+    <head>
+        <title>Quiz App</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="css/all.css">
+    </head>
+
+    <body>
+        <nav class="navbar navbar-full bg-primary">
+            <div class="container-fluid">
+                <span class="navbar-brand">Quiz App</span>
+                <div class="navbar-brand pull-xs-right">Hello, <span id="name">Name Here</span></div>
+            </div>
+        </nav>
+        <div class="container">
+ 
+                    <div class="card">
+                        <div class="card-header text-xs-center">Question <span class="current">1</span></div>
+
+                        <div class="card-block">
+                            
+                            <h5>What is the air speed velocity of an unladen swallow?</h5>
+                        
+                            <form action="">
+                                <fieldset class="form-group">
+                                    <div class="radio">
+                                        <label for="choiceOne"><input type="radio" name="choiceOne">African or European?</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label for="choiceTwo"><input type="radio" name="choiceTwo">African</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label for="choiceThree"><input type="radio" name="choiceThree">European</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label for="choiceFour"><input type="radio" name="choiceFour">Are you implying that coconuts migrate?</label>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+
+                        <div class="card-footer text-xs-center">
+                            <a href="#" class="btn btn-primary prev pull-xs-left">Prev</a>
+                            <a href="#" class="btn" id="count"><span class="current">1</span> / <span class="total">10</span></a>
+                            <a href="#" class="btn btn-primary next pull-xs-right">Next</a>
+                        </div>
+                    </div>
+ 
+        </div>
+    </body>
+</html>
