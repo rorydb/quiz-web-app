@@ -259,7 +259,7 @@ var changeName = function() {
 var promptName = function() {
 	var row = $("<div></div>");
 	var column = $("<div></div>");
-	var form = $("<form action=# class=\"form-inline\"><fieldset class=\"form-group\"></fieldset></form>")
+	var form = $("<form action=# class=\"user-name form-inline\"><fieldset class=\"form-group\"></fieldset></form>")
 	var input = $("<input />");
 	var btn = $("<button></button>");
 
@@ -286,10 +286,10 @@ var promptName = function() {
 		.insertBefore(".row").first()
 		.fadeIn(600);
 
-	form.submit( function(e) {
+	$("form.user-name").submit( function(e) {
 		e.preventDefault();
 
-		var name = $(input).val();
+		var name = $(this).find("input.name").val();
 
 		if (name.length > 0) {
 			$('#name').text(name);
@@ -298,7 +298,7 @@ var promptName = function() {
 			return;
 		}
 
-		row.fadeOut(200, function() { $(this).remove(); });
+		$(".get-name").fadeOut(200, function() { $(this).remove(); });
 	});
 };
 
