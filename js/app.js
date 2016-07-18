@@ -303,6 +303,7 @@ var promptName = function() {
 };
 
 $(document).ready(function(){
+    $('.btn.next').prop("disabled", false);
 	setQuizName();
     quizLength();
     loadRecentScores();
