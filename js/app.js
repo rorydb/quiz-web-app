@@ -1,6 +1,8 @@
 var allQuizzes = [];
 var activeQuiz = new Quiz("The New Quiz", []);
 
+var recentScores = [];
+
 activeQuiz.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
 activeQuiz.addQuestion(new Question("This is the second question?",["si","no","not sure"],"si"));
 
@@ -16,6 +18,27 @@ var setQuizName = function() {
  */
 var quizLength = function() {
     $('.total').text(activeQuiz.questions.length);
+};
+
+var loadRecentScores = function() {
+    if (localStorage) {
+        if (localStorage.getItem("recentScores")) {
+            recentScores = JSON.parse(localStorage.getItem("recentScores"));
+            var listOfScores = $("#recent-scores").find("li");
+
+            console.log(recentScores[0]);
+
+            for (var i = 0; i < recentScores.length; i++) {
+                var score = recentScores[i];
+                var newRecord = $("<li class=\"list-group-item\">" + score.name + "&nbsp;-&nbsp;" + score.time +
+                    "<span class=\"label label-default label-pill pull-xs-right\">" + score.score + "%</span>" + "</li>");
+
+                newRecord.insertAfter(listOfScores.first());
+            }
+        } else {
+            return false;
+        }
+    }
 };
 
 var previousQuestion = function() {
@@ -43,6 +66,7 @@ var nextQuestion = function() {
 
             if (currentQuestion === activeQuiz.questions.length - 1) {
                 displayResults(activeQuiz.getScore());
+                storeScore(activeQuiz.getScore());
             } else if (isNaN(currentQuestion)) {
                 loadQuestion(activeQuiz.questions[0],0);
             } else {
@@ -91,7 +115,10 @@ var checkAnswer = function() {
 };
 
 
-
+/**
+ * Displays the final quiz score
+ * @param score - score calculated from user answers
+ */
 var displayResults = function(score) {
     var header = $(".card-header");
     var	body = $(".card-block");
@@ -179,8 +206,36 @@ var loadQuestion = function(questionObj, index) {
 	count.text(index+1);
 };
 
+/**
+ * Stores a score in an array + local storage and displays it in the markup with percent correct answers and date
+ * @param score - final score
+ */
+var storeScore = function(score) {
+    var time = new Date();
+    var quizResult = {name: activeQuiz.name, score: score, time: time.toLocaleDateString() + " " + time.toLocaleTimeString()};
+    var newRecord = $("<li class=\"list-group-item\">" + quizResult.name + "&nbsp;-&nbsp;" + quizResult.time +
+        "<span class=\"label label-default label-pill pull-xs-right\">" + quizResult.score + "%</span>" + "</li>");
+    var listOfScores = $("#recent-scores").find("li");
 
+    if (recentScores.length >= 5) {
+        recentScores.splice(0, 1);
+        recentScores.push(quizResult);
+    } else {
+        recentScores.push(quizResult);
+        console.log(recentScores);
+    }
 
+    if (localStorage) {
+        localStorage.setItem("recentScores", JSON.stringify(recentScores));
+        console.log(localStorage.getItem("recentScores"));
+    }
+
+    if (listOfScores.length > 5) {
+        listOfScores.last().remove();
+    }
+
+    newRecord.insertAfter(listOfScores.first());
+};
 
 // Checks to see if a user has set a name.
 var whatsInAName = function() {
@@ -252,6 +307,7 @@ var promptName = function() {
 $(document).ready(function(){
 	setQuizName();
     quizLength();
+    loadRecentScores();
     previousQuestion();
 	nextQuestion();
 	whatsInAName();

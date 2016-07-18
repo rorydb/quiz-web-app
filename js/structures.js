@@ -82,7 +82,6 @@ Quiz.prototype.getScore = function() {
     var totalQuestions = this.questions.length;
 
     for (var i = 0; i < totalQuestions; i++) {
-        console.log(this.questions[i].lastAnswerCorrect)
         if (this.questions[i].lastAnswerCorrect) {
             correctAnswers++;
         }
