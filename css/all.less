@@ -1,18 +1,30 @@
 @import (css) "bootstrap.css";
 
+
 body { background-color: lighten(#0275d8, 20%) !important; }
+
+.row {
+    margin-bottom: 2rem;
+}
 
 .navbar { margin-bottom: 2rem; }
 
 #name { cursor: pointer; }
 
 .card-block {
-  .form-group { margin-bottom: 0; }
+    .form-group { margin-bottom: 0; }
 
-  .radio input[type="radio"] { margin-left: 0 !important; margin-right: .75em; }
+    .radio input[type="radio"] { margin-left: 0 !important; margin-right: .75em; }
 
-  .alert-danger{
-    display: none;
-  }
+    .alert-danger{
+        display: none;
+    }
 }
 
+#recent-scores { margin-bottom: 2rem; }
+
+ul > .list-group-item:first-of-type { background: #f5f5f5; }
+
+@media (min-width: 768px) {
+    #recent-scores { margin-bottom: 0; }
+}

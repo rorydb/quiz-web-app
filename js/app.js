@@ -106,7 +106,8 @@ var displayResults = function(score) {
             .text("Finished!")
             .fadeTo(400, 1, function() {
                 prev.add(next)
-                    .removeClass("animating");
+                    .removeClass("animating")
+                    .attr("disabled",true);
             });
     });
 
