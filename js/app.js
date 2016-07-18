@@ -25,9 +25,7 @@ var loadRecentScores = function() {
         if (localStorage.getItem("recentScores")) {
             recentScores = JSON.parse(localStorage.getItem("recentScores"));
             var listOfScores = $("#recent-scores").find("li");
-
-            console.log(recentScores[0]);
-
+            
             for (var i = 0; i < recentScores.length; i++) {
                 var score = recentScores[i];
                 var newRecord = $("<li class=\"list-group-item\">" + score.name + "&nbsp;-&nbsp;" + score.time +
