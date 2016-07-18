@@ -1,9 +1,8 @@
 var allQuizzes = [];
 var activeQuiz = new Quiz("The New Quiz", []);
-var numberCorrect = 0;
 
 activeQuiz.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
-activeQuiz.addQuestion(new Question("This is the second question?",["si","no","not sure"],"yes"));
+activeQuiz.addQuestion(new Question("This is the second question?",["si","no","not sure"],"si"));
 
 /**
  *	Sets initial name of active quiz
@@ -23,7 +22,7 @@ var previousQuestion = function() {
 	$(".btn.prev").click( function() {
 		var currentQuestion = $("form").attr("data-question");
         if (currentQuestion === activeQuiz.questions.length !== 0) {
-            loadQuestion(activeQuiz.questions[currentQuestion - 1], currentQuestion -1)
+            loadQuestion(activeQuiz.questions[currentQuestion - 1], currentQuestion -1);
         } else {
             return false;
         }
@@ -43,7 +42,7 @@ var nextQuestion = function() {
         } else {
 
             if (currentQuestion === activeQuiz.questions.length - 1) {
-                calculateResults();
+                displayResults(activeQuiz.getScore());
             } else if (isNaN(currentQuestion)) {
                 loadQuestion(activeQuiz.questions[0],0);
             } else {
@@ -53,8 +52,6 @@ var nextQuestion = function() {
                         .addClass("alert-success")
                         .text("That's correct!")
                         .fadeIn(200);
-
-                    numberCorrect++;
                 } else if (!checkAnswer()) {
                     warning
                         .text("That's incorrect...")
@@ -84,18 +81,18 @@ var questionAnswered = function() {
  * @returns {boolean}
  */
 var checkAnswer = function() {
+    var currentQuestion = activeQuiz.questions[parseInt($("form").attr("data-question"))];
     var chosenAnswer = $("input[name=choice]:checked").val();
-    var correctAnswer = activeQuiz.questions[parseInt($("form").attr("data-question"))].correctAnswer;
+    var correctAnswer = currentQuestion.correctAnswer;
 
-    chosenAnswer === correctAnswer;
+    currentQuestion.setLastAnswer(chosenAnswer);
 
     return chosenAnswer === correctAnswer;
 };
 
 
 
-var calculateResults = function() {
-    var score = (numberCorrect / activeQuiz.questions.length).toFixed(2) * 100;
+var displayResults = function(score) {
     var header = $(".card-header");
     var	body = $(".card-block");
     var prev = $(".btn.prev");
@@ -136,9 +133,15 @@ var loadQuestion = function(questionObj, index) {
 
 	var createOption = function(choices) {
 		var htmlString = "";
+        var checked = "";
 
 		for (var i = 0; i < choices.length; i++) {
-			htmlString += "<div class=\"radio\"><label><input type=\"radio\" name=\"choice\" value=\"" + choices[i] + "\"\/>" + choices[i] + "</label></div>";
+            if (questionObj.lastAnswer !== "" && questionObj.lastAnswer === choices[i]) {
+                checked = "checked";
+            }
+			htmlString += "<div class=\"radio\"><label><input type=\"radio\" name=\"choice\" value=\"" + choices[i] + "\"" + checked + "\/>" + choices[i] + "</label></div>";
+            checked = "";
+
 		}
 
 		return htmlString;
@@ -255,7 +258,6 @@ $(document).ready(function(){
 
 
     $("body").on("click", "input[name=choice]", function () {
-        console.log('clicked');
         checkAnswer();
     });
 });

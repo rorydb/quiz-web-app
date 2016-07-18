@@ -9,6 +9,7 @@ function Question (question, choices, correctAnswer) {
 	this.choices = choices;
 	this.correctAnswer = correctAnswer;
     this.lastAnswer = "";
+    this.lastAnswerCorrect = false;
 }
 
 Question.prototype.changeQuestion = function(question) {
@@ -32,7 +33,15 @@ Question.prototype.changeCorrectAnswer = function(correctAnswer) {
 	this.correctAnswer = correctAnswer;
 };
 
-Question.prototype
+Question.prototype.setLastAnswer = function(lastAnswer) {
+    this.lastAnswer = lastAnswer;
+
+    if (this.lastAnswer === this.correctAnswer) {
+        this.lastAnswerCorrect = true;
+    } else {
+        this.lastAnswerCorrect = false;
+    }
+};
 
 /**
  *	A full quiz, this holds questions
@@ -66,4 +75,19 @@ Quiz.prototype.removeQuestion = function (questionText) {
     } else {
         console.log("this question isn't in the quiz!");
     }
+};
+
+Quiz.prototype.getScore = function() {
+    var correctAnswers = 0;
+    var totalQuestions = this.questions.length;
+
+    for (var i = 0; i < totalQuestions; i++) {
+        console.log(this.questions[i].lastAnswerCorrect)
+        if (this.questions[i].lastAnswerCorrect) {
+            correctAnswers++;
+        }
+    }
+
+    return (correctAnswers/ totalQuestions).toFixed(2) * 100;
+
 };
