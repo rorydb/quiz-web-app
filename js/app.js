@@ -351,6 +351,8 @@ var newQuiz = function() {
                         .hide()
                         .insertBefore($(this).closest(".row.controls"))
                         .fadeIn(200);
+
+                    backgroundSize();
                 });
 
                 $(".modal-block").on("click", ".add-question", function() {
@@ -414,6 +416,7 @@ var newQuiz = function() {
                         .fadeIn(1000);
                     $("<hr />").insertAfter(lastQuestion);
 
+                    backgroundSize();
                 });
 
                 $(".btn.exit").click( function(e) {
@@ -422,6 +425,10 @@ var newQuiz = function() {
                         $(this).remove();
                     });
                 });
+
+                var backgroundSize = function() {
+                    $(".modal-background").css({"height":$(document).height()});
+                }
 
             }
         })
