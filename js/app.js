@@ -1,10 +1,7 @@
 var allQuizzes = [];
-var activeQuiz = new Quiz("The New Quiz", []);
+var activeQuiz = '';
 
 var recentScores = [];
-
-activeQuiz.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
-activeQuiz.addQuestion(new Question("This is the second question?",["si","no","not sure"],"si"));
 
 /**
  *	Sets initial name of active quiz
@@ -20,6 +17,9 @@ var quizLength = function() {
     $('.total').text(activeQuiz.questions.length);
 };
 
+/**
+ * Loads the five most recent scores from a user.
+ */
 var loadRecentScores = function() {
     if (localStorage) {
         if (localStorage.getItem("recentScores")) {
@@ -35,6 +35,59 @@ var loadRecentScores = function() {
             }
         } else {
             return false;
+        }
+    }
+};
+
+/**
+ * Loads quizzes from localStorage or loads default quizzes
+ */
+var loadQuizzesToSelection = function() {
+    if (localStorage) {
+        if (localStorage.getItem("quizzes")) {
+
+        } else {
+            var quiz1 = new Quiz("Default Quiz", []);
+            var quiz2 = new Quiz("Second Quiz", []);
+            var quiz3 = new Quiz("Third Quiz", []);
+            var quiz4 = new Quiz("Fourth Quiz", []);
+            var quiz5 = new Quiz("Fifth Quiz", []);
+            var quiz6 = new Quiz("Sixth Quiz", []);
+            var quiz7 = new Quiz("Seventh Quiz", []);
+            var quiz8 = new Quiz("Eigth Quiz", []);
+            var quiz9 = new Quiz("Ninth Quiz", []);
+            var quiz10 = new Quiz("Tenth Quiz", []);
+
+            quiz1.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
+            quiz1.addQuestion(new Question("This is the second question?",["si","no","not sure"],"si"));
+            quiz1.addQuestion(new Question("What is the air-speed velocity of an unladen swallow?",["african","european","african or european?","i don't know that"],"african or european?"));
+
+            allQuizzes.push(quiz1, quiz2, quiz3, quiz4, quiz5, quiz6, quiz7, quiz8, quiz9, quiz10);
+
+            /**
+             * THIS IS TEMPORARY
+             */
+            activeQuiz = allQuizzes[0];
+
+            for (var i = allQuizzes.length - 1; i >= 0; i--) {
+                var title = allQuizzes[i].name;
+                var quizList = $("#quizzes").find("li");
+                var display = i >= 4 ? "display: none" : "display: block";
+                var hiddenClass = i >= 4 ? "hidden" : ""
+                var newQuiz = $("<li class=\"list-group-item " + hiddenClass + "\" style=\"" + display + "\"><a href=\"#\">" + title + "</a></li>");
+
+                if (i === 4) {
+                    $("<li class=\"list-group-item list-group-item-info more\"><a href=\"#\">More</a></li>").insertAfter(quizList.last());
+                }
+
+                newQuiz.insertAfter(quizList.first());
+            }
+
+            $("body").on("click", "li.more a", function(e) {
+                e.preventDefault();
+                $("#quizzes").find("li.hidden").slideToggle(200);
+                $(this).text() === "More" ? $(this).text("Less") : $(this).text("More");
+            });
         }
     }
 };
@@ -63,8 +116,23 @@ var nextQuestion = function() {
         } else {
 
             if (currentQuestion === activeQuiz.questions.length - 1) {
-                displayResults(activeQuiz.getScore());
-                storeScore(activeQuiz.getScore());
+                if (checkAnswer()) {
+                    warning
+                        .removeClass("alert-danger")
+                        .addClass("alert-success")
+                        .text("That's correct!")
+                        .fadeIn(200);
+                } else if (!checkAnswer()) {
+                    warning
+                        .text("That's incorrect...")
+                        .fadeIn(200);
+                }
+
+                setTimeout( function() {
+                    displayResults(activeQuiz.getScore());
+                    storeScore(activeQuiz.getScore());
+                }, 800);
+                
             } else if (isNaN(currentQuestion)) {
                 loadQuestion(activeQuiz.questions[0],0);
             } else {
@@ -220,7 +288,6 @@ var storeScore = function(score) {
         recentScores.push(quizResult);
     } else {
         recentScores.push(quizResult);
-        console.log(recentScores);
     }
 
     if (localStorage) {
@@ -233,6 +300,132 @@ var storeScore = function(score) {
     }
 
     newRecord.insertAfter(listOfScores.first());
+};
+
+
+/**
+ * Loads a new quiz form from AJAX into a modal, add interactivity
+ */
+var newQuiz = function() {
+    $(".add-quiz").click( function(e) {
+        e.preventDefault();
+
+        var url = $(this).attr("href");
+
+        $.ajax({
+            url: url,
+            method: "GET",
+            dataType: "html",
+            success: function(html) {
+                var container = $("<div class=\"modal-block\"></div>");
+                var background = $("<div class=\"modal-background\"></div>");
+                var row = $("<div class=\"row\"></div>");
+                var fullColumn = $("<div class=\"col-xs-12\"></div>");
+                var halfColumn = $("<div class=\"col-xs-12 col-sm-6\"></div>");
+
+                container.append(html);
+
+                container.add(background)
+                    .prependTo($("body"))
+                    .fadeIn();
+
+                $("form").on("click", ".btn", function(e) {
+                    e.preventDefault();
+                });
+
+                $("form").on("click", ".add-answers", function() {
+                    var question = $(this).closest("formset");
+                    var questionNumber = question.attr("data-question");
+                    var lastAnswerNumber = parseInt(question.find(".question").last().attr("data-answer"));
+                    var newAnswerNumbers = [lastAnswerNumber + 1, lastAnswerNumber + 2];
+                    var newRow =  $("<div class=\"row\"></div>");
+
+                    // Creating new answer inputs
+                    for (var i = 0; i < newAnswerNumbers.length; i++) {
+                        var inputName = "q" + questionNumber + "a" + newAnswerNumbers[i];
+
+                        newRow.append($("<div class=\"col-xs-12 col-sm-6 question\" data-answer=\"" + newAnswerNumbers[i] + "\"><input type=\"text\" class=\"form-control\" id=\"" + inputName + "\" name=\"" + inputName + "\" placeholder=\"Enter an answer\" /><small><label>Correct Answer? <input type=\"radio\" name=\"q" + questionNumber + "-correctAnswer\" value=\"" + inputName + "\" /></label></small></div>"));
+                    }
+
+                    newRow
+                        .hide()
+                        .insertBefore($(this).closest(".row.controls"))
+                        .fadeIn(200);
+                });
+
+                $(".modal-block").on("click", ".add-question", function() {
+                    var lastQuestion = $(".modal-block").find("formset").last();
+                    var newQuestionNumber = parseInt(lastQuestion.attr("data-question")) + 1;
+                    
+                    var newFormset = $("<formset></formset>").attr({
+                        "class":"form-group",
+                        "data-question":newQuestionNumber
+                    });
+
+                    newFormset.html("<div class=\"row\"></div><div class=\"row\"></div>");
+
+                    var formsetRows = newFormset.find(".row");
+
+                    var containerOne = $("<div></div>").attr({"class":"col-xs-12"}); 
+                    var newLabel = $("<label></label>")
+                        .attr({"for":"question-"+newQuestionNumber})
+                        .text("Question " + newQuestionNumber);
+                    var newInput = $("<input />").attr({
+                        "type":"text",
+                        "class":"form-control",
+                        "id":"question-"+newQuestionNumber,
+                        "name":"question-"+newQuestionNumber,
+                        "placeholder":"Enter a Question"
+                    });
+
+                    containerOne.append(newLabel,newInput);
+                    formsetRows.first().append(containerOne);
+
+                    for (var i = 1; i <= 2; i++) {
+                        var containerTwo = $("<div></div>").attr({
+                            "class":"col-xs-12 col-sm-6 question",
+                            "data-answer":i
+                        });
+                        var input = $("<input />").attr({
+                            "type":"text",
+                            "class":"form-control",
+                            "id":"q" + newQuestionNumber + "a" + i,
+                            "name":"q" + newQuestionNumber + "a" + i,
+                            "placeholder":"Enter an answer"
+                        });
+                        var defaultLabel = $("<small><label><span>Correct Answer\? </span><label></small>");
+                        var defaultRadio = $("<input />").attr({
+                            "type":"radio",
+                            "name":"q" + newQuestionNumber + "-correctAnswer",
+                            "value":"q" + newQuestionNumber + "a" + i
+                        })
+
+                        defaultLabel.append(defaultRadio);
+                        containerTwo.append(input, defaultLabel);
+
+                        formsetRows.last().append(containerTwo);
+                    }
+
+                    newFormset.append($("<div class=\"row controls\"><div class=\"col-xs-12\"><button class=\"btn btn-primary add-answers\">Add Answers</button></div></div>"));
+
+                    newFormset
+                        .hide()
+                        .insertAfter(lastQuestion)
+                        .fadeIn(1000);
+                    $("<hr />").insertAfter(lastQuestion);
+
+                });
+
+                $(".btn.exit").click( function(e) {
+                    e.preventDefault();
+                    $(".modal-block, .modal-background").fadeOut( function() {
+                        $(this).remove();
+                    });
+                });
+
+            }
+        })
+    });
 };
 
 // Checks to see if a user has set a name.
@@ -304,6 +497,7 @@ var promptName = function() {
 
 $(document).ready(function(){
     $('.btn.next').prop("disabled", false);
+    loadQuizzesToSelection();
 	setQuizName();
     quizLength();
     loadRecentScores();
@@ -311,6 +505,7 @@ $(document).ready(function(){
 	nextQuestion();
 	whatsInAName();
 	changeName();
+    newQuiz();
 
 
     $("body").on("click", "input[name=choice]", function () {
