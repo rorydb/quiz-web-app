@@ -325,6 +325,10 @@ var newQuiz = function() {
 
                 $("#quiz-name").focusout( function() {
                     if ($(this).val().length === 0) {
+                        if ($(this).siblings(".alert").length > 0) {
+                            return;
+                        }
+
                         $("<div class=\"alert alert-danger\">Please enter a quiz name.</div>")
                             .insertAfter($(this))
                             .fadeIn(200);
