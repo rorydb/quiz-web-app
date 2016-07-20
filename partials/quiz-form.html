@@ -3,7 +3,7 @@
         <div class="card-header text-xs-center"><h5>Create New Quiz</h5></div>
 
         <div class="card-block">
-            <form action="#" class="">
+            <form action="#" class="new-quiz">
                 <formset class="form-group">
                     <div class="row">
                         <div class="col-xs-12">
@@ -13,24 +13,22 @@
                     </div>
                 </formset>
 
-                <hr />
-
                 <formset class="form-group new quiz-question" data-question="1">
                     <div class="row">
                         <div class="col-xs-12">
                             <label for="question-1">Question 1</label>
-                            <input type="text" class="form-control" id="question-1" name="question-1" placeholder="Enter a Question" />
+                            <input type="text" class="form-control question-text" id="question-1" name="question-1" placeholder="Enter a Question" />
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-xs-12 col-sm-6 question" data-answer="1">
-                            <input type="text" class="form-control" id="q1a1" name="q1a1" placeholder="Enter an answer" />
-                            <small><label>Correct Answer? <input type="radio" name="q1-correctAnswer" value="q1a1" /></label></small>
+                            <input type="text" class="form-control question-answer" id="q1a1" name="q1a1" placeholder="Enter an answer" />
+                            <small><label>Correct Answer? <input type="radio" name="q1-correctAnswer" value="q1a1" checked/></label></small>
                         </div>
 
                         <div class="col-xs-12 col-sm-6 question" data-answer="2">
-                            <input type="text" class="form-control" id="q1a2" name="q1a2" placeholder="Enter an answer" />
+                            <input type="text" class="form-control question-answer" id="q1a2" name="q1a2" placeholder="Enter an answer" />
                             <small><label>Correct Answer? <input type="radio" name="q1-correctAnswer" value="q1a2" /></label></small>
                         </div>
                     </div>

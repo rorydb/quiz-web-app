@@ -28,8 +28,16 @@ var loadRecentScores = function() {
             
             for (var i = 0; i < recentScores.length; i++) {
                 var score = recentScores[i];
-                var newRecord = $("<li class=\"list-group-item\">" + score.name + "&nbsp;-&nbsp;" + score.time +
-                    "<span class=\"label label-default label-pill pull-xs-right\">" + score.score + "%</span>" + "</li>");
+                var newRecord = $("<li></li>")
+                    .attr({
+                        "class": "list-group-item"
+                    })
+                    .text(score.name + " - " + score.time)
+                    .append(
+                        $("<span></span>")
+                            .attr({"class": "label label-default label-pill pull-xs-right"})
+                            .text(score.score + "%")
+                    );
 
                 newRecord.insertAfter(listOfScores.first());
             }
@@ -44,9 +52,42 @@ var loadRecentScores = function() {
  */
 var loadQuizzesToSelection = function() {
     if (localStorage) {
-        if (localStorage.getItem("quizzes")) {
 
-        } else {
+        /**
+         * TODO: Turn quiz JSON data into actual objects
+         */
+
+        // if (localStorage.getItem("quizzes")) {
+        //     allQuizzes = JSON.parse(localStorage.getItem("quizzes"));
+        //     /**
+        //      * THIS IS TEMPORARY
+        //      */
+        //     activeQuiz = allQuizzes[0];
+
+        //     for (var i = allQuizzes.length - 1; i >= 0; i--) {
+        //         var title = allQuizzes[i].name;
+        //         var quizList = $("#quizzes").find("li");
+        //         var display = i >= 4 ? "display: none" : "display: block";
+        //         var hiddenClass = i >= 4 ? "hidden" : ""
+        //         var newQuiz = $("<li class=\"list-group-item " + hiddenClass + "\" style=\"" + display + "\"><a href=\"#\">" + title + "</a></li>");
+
+        //         if (i === 4) {
+        //             $("<li class=\"list-group-item list-group-item-info more\"><a href=\"#\">More</a></li>").insertAfter(quizList.last());
+        //         }
+
+        //         newQuiz.insertAfter(quizList.first());
+        //     }
+
+        //     setQuizName();
+        //     quizLength();            
+
+        //     $("body").on("click", "li.more a", function(e) {
+        //         e.preventDefault();
+        //         $("#quizzes").find("li.hidden").slideToggle(200);
+        //         $(this).text() === "More" ? $(this).text("Less") : $(this).text("More");
+        //     });            
+
+        // } else {
             var quiz1 = new Quiz("Default Quiz", []);
 
             quiz1.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
@@ -74,12 +115,15 @@ var loadQuizzesToSelection = function() {
                 newQuiz.insertAfter(quizList.first());
             }
 
+            setQuizName();
+            quizLength();            
+
             $("body").on("click", "li.more a", function(e) {
                 e.preventDefault();
                 $("#quizzes").find("li.hidden").slideToggle(200);
                 $(this).text() === "More" ? $(this).text("Less") : $(this).text("More");
             });
-        }
+        // }
     }
 };
 
@@ -210,8 +254,17 @@ var displayResults = function(score) {
 var loadQuestion = function(questionObj, index) {
 	var header = $(".card-header");
 	var	body = $(".card-block");
-	var form = $("<form action=\"#\" class=\"quiz-question\" data-question=\"" + index + "\"><fieldset class=\"form-group\"></fieldset></form>");
-    var warning = $("<div class=\"answer alert alert-danger\"></div>");
+	var form =
+        $("<form></form>")
+        .attr({
+            "action": "#",
+            "class": "quiz-question",
+            "data-question": index,
+        })
+        .append(
+            $("<fieldset></fieldset>").attr({"class": "form-group"})
+        );
+    var warning = $("<div></div>").attr({"class": "answer alert alert-danger"});
 	var count = $(".current");
 	var prev = $(".btn.prev");
     var next = $(".btn.next");
@@ -226,7 +279,6 @@ var loadQuestion = function(questionObj, index) {
             }
 			htmlString += "<div class=\"radio\"><label><input type=\"radio\" name=\"choice\" value=\"" + choices[i] + "\"" + checked + "\/>" + choices[i] + "</label></div>";
             checked = "";
-
 		}
 
 		return htmlString;
@@ -270,8 +322,17 @@ var loadQuestion = function(questionObj, index) {
 var storeScore = function(score) {
     var time = new Date();
     var quizResult = {name: activeQuiz.name, score: score, time: time.toLocaleDateString() + " " + time.toLocaleTimeString()};
-    var newRecord = $("<li class=\"list-group-item\">" + quizResult.name + "&nbsp;-&nbsp;" + quizResult.time +
-        "<span class=\"label label-default label-pill pull-xs-right\">" + quizResult.score + "%</span>" + "</li>");
+    var newRecord =
+        $("<li></li>")
+            .attr({
+                "class": "list-group-item"
+            })
+            .text(quizResult.name + " - " + quizResult.time)
+            .append(
+                $("<span></span>")
+                    .attr({"class": "label label-default label-pill pull-xs-right"})
+                    .text(quizResult.score + "%")
+            );
     var listOfScores = $("#recent-scores").find("li");
 
     if (recentScores.length >= 5) {
@@ -310,8 +371,7 @@ var newQuiz = function() {
                 var container = $("<div class=\"modal-block\"></div>");
                 var background = $("<div class=\"modal-background\"></div>");
                 var row = $("<div class=\"row\"></div>");
-                var fullColumn = $("<div class=\"col-xs-12\"></div>");
-                var halfColumn = $("<div class=\"col-xs-12 col-sm-6\"></div>");
+                var quizForm = $("form.new-quiz");
 
                 container.append(html);
 
@@ -319,7 +379,7 @@ var newQuiz = function() {
                     .prependTo($("body"))
                     .fadeIn();
 
-                $("form").on("click", ".btn", function(e) {
+                quizForm.on("click", ".btn", function(e) {
                     e.preventDefault();
                 });
 
@@ -340,7 +400,7 @@ var newQuiz = function() {
                     }
                 });
 
-                $("form").on("click", ".add-answers", function() {
+                quizForm.on("click", ".add-answers", function() {
                     var question = $(this).closest("formset");
                     var questionNumber = question.attr("data-question");
                     var lastAnswerNumber = parseInt(question.find(".question").last().attr("data-answer"));
@@ -351,7 +411,7 @@ var newQuiz = function() {
                     for (var i = 0; i < newAnswerNumbers.length; i++) {
                         var inputName = "q" + questionNumber + "a" + newAnswerNumbers[i];
 
-                        newRow.append($("<div class=\"col-xs-12 col-sm-6 question\" data-answer=\"" + newAnswerNumbers[i] + "\"><input type=\"text\" class=\"form-control\" id=\"" + inputName + "\" name=\"" + inputName + "\" placeholder=\"Enter an answer\" /><small><label>Correct Answer? <input type=\"radio\" name=\"q" + questionNumber + "-correctAnswer\" value=\"" + inputName + "\" /></label></small></div>"));
+                        newRow.append($("<div class=\"col-xs-12 col-sm-6 question\" data-answer=\"" + newAnswerNumbers[i] + "\"><input type=\"text\" class=\"form-control question-answer\" id=\"" + inputName + "\" name=\"" + inputName + "\" placeholder=\"Enter an answer\" /><small><label>Correct Answer? <input type=\"radio\" name=\"q" + questionNumber + "-correctAnswer\" value=\"" + inputName + "\" /></label></small></div>"));
                     }
 
                     newRow
@@ -367,7 +427,7 @@ var newQuiz = function() {
                     var newQuestionNumber = parseInt(lastQuestion.attr("data-question")) + 1;
                     
                     var newFormset = $("<formset></formset>").attr({
-                        "class":"form-group",
+                        "class":"form-group new quiz-question",
                         "data-question":newQuestionNumber
                     });
 
@@ -381,7 +441,7 @@ var newQuiz = function() {
                         .text("Question " + newQuestionNumber);
                     var newInput = $("<input />").attr({
                         "type":"text",
-                        "class":"form-control",
+                        "class":"form-control question-text",
                         "id":"question-"+newQuestionNumber,
                         "name":"question-"+newQuestionNumber,
                         "placeholder":"Enter a Question"
@@ -397,7 +457,7 @@ var newQuiz = function() {
                         });
                         var input = $("<input />").attr({
                             "type":"text",
-                            "class":"form-control",
+                            "class":"form-control question-answer",
                             "id":"q" + newQuestionNumber + "a" + i,
                             "name":"q" + newQuestionNumber + "a" + i,
                             "placeholder":"Enter an answer"
@@ -407,7 +467,7 @@ var newQuiz = function() {
                             "type":"radio",
                             "name":"q" + newQuestionNumber + "-correctAnswer",
                             "value":"q" + newQuestionNumber + "a" + i
-                        })
+                        });
 
                         defaultLabel.append(defaultRadio);
                         containerTwo.append(input, defaultLabel);
@@ -426,11 +486,62 @@ var newQuiz = function() {
                     backgroundSize();
                 });
 
-                $(".btn.exit").click( function() {å
+                $(".btn.exit").click( function() {
                     $(".modal-block, .modal-background").fadeOut( function() {
                         $(this).remove();
                     });
                 });
+
+                $(".btn.save").click( function() {
+                    var warning = $("<div class=\"alert alert-danger\"></div>");
+                    var quizName = $("#quiz-name").val();
+                    var questions = $(".new.quiz-question");
+                    var questionArray = [];
+                    var content = $(".modal-block .card-block");
+
+                    content.children(".alert")
+                        .remove();
+
+                    if (quizName.length === 0) {
+                        warning
+                            .text("Please enter a quiz name.")
+                            .appendTo(content)
+                            .fadeIn(200);
+
+                        return;
+                    }
+
+                    // Adding questions and choices to questionArray in form of Question object
+                    questions.each( function() {
+                        var questionText = $(this).find(".question-text").val();
+                        var answers = [];
+                        var correctAnswer = "#" + $(this).find("input[type=radio]:checked").val();
+
+                        if (questionText.length === 0) {
+                            // do nothing
+                        } else {
+                            $(this).find(".question-answer").each( function() {
+                                var answerText = ($(this)).val();
+                                if (answerText.length === 0) {
+                                    // do nothing
+                                } else {
+                                    answers.push(answerText);
+                                }
+                            });
+
+                            correctAnswer = $(correctAnswer).val();
+
+                            questionArray.push(new Question(questionText, answers, correctAnswer));
+                        }
+                    });
+
+                    allQuizzes.push(new Quiz(quizName, questionArray));
+
+                    if (localStorage) {
+                        localStorage.setItem("quizzes",JSON.stringify(allQuizzes));
+                    }
+                });
+
 
                 var backgroundSize = function() {
                     $(".modal-background").css({"height":$(document).height()});
@@ -441,78 +552,9 @@ var newQuiz = function() {
     });
 };
 
-// Checks to see if a user has set a name.
-var whatsInAName = function() {
-	var prompt = "Do you have a name?";
-
-	if (localStorage) {
-        if (localStorage.getItem("name") === null) {
-            promptName();
-        } else {
-            $('#name').text(localStorage.getItem("name"));
-        }
-    }
-};
-
-// Allows user to change their name
-var changeName = function() {
-	if (localStorage) {
-        $("#name").click(promptName);
-    }
-};
-
-// Prompts for a name change
-var promptName = function() {
-	var row = $("<div></div>");
-	var column = $("<div></div>");
-	var form = $("<form action=# class=\"user-name form-inline\"><fieldset class=\"form-group\"></fieldset></form>")
-	var input = $("<input />");
-	var btn = $("<button></button>");
-
-	row
-		.addClass("row get-name")
-		.css("margin-bottom", "2rem");
-	column.addClass("col-xs-12 col-md-8 col-md-offset-2");
-	form.addClass("text-xs-center");
-	input
-		.addClass("name form-control")
-		.attr("type","text")
-		.attr("placeholder","What is your name?");
-	btn
-		.addClass("btn btn-secondary")
-		.attr("type","submit")
-		.text("Submit");
-
-	row.append(column);
-	column.append(form);
-	form.append(input,btn);
-
-	row
-		.hide()
-		.insertBefore(".row").first()
-		.fadeIn(600);
-
-	$("form.user-name").submit( function(e) {
-		e.preventDefault();
-
-		var name = $(this).find("input.name").val();
-
-		if (name.length > 0) {
-			$('#name').text(name);
-			localStorage.setItem("name", name);
-		} else {
-			return;
-		}
-
-		$(".get-name").fadeOut(200, function() { $(this).remove(); });
-	});
-};
-
 $(document).ready(function(){
     $('.btn.next').prop("disabled", false);
     loadQuizzesToSelection();
-	setQuizName();
-    quizLength();
     loadRecentScores();
     previousQuestion();
 	nextQuestion();
