@@ -105,7 +105,7 @@ var previousQuestion = function() {
 
 var nextQuestion = function() {
 	$(".btn.next").click( function() {
-		var currentQuestion = parseInt($("form").attr("data-question"));
+		var currentQuestion = parseInt($("form.quiz-question").attr("data-question"));
         var warning = $(".answer.alert");
 
         if (questionAnswered() === false) {
@@ -171,9 +171,12 @@ var questionAnswered = function() {
  * @returns {boolean}
  */
 var checkAnswer = function() {
-    var currentQuestion = activeQuiz.questions[parseInt($("form").attr("data-question"))];
+    var currentQuestion = activeQuiz.questions[parseInt($("form.quiz-question").attr("data-question"))];
     var chosenAnswer = $("input[name=choice]:checked").val();
     var correctAnswer = currentQuestion.correctAnswer;
+
+    console.log(currentQuestion);
+    console.log(chosenAnswer);
 
     currentQuestion.setLastAnswer(chosenAnswer);
 
@@ -219,7 +222,7 @@ var displayResults = function(score) {
 var loadQuestion = function(questionObj, index) {
 	var header = $(".card-header");
 	var	body = $(".card-block");
-	var form = $("<form action=\"#\" data-question=\"" + index + "\"><fieldset class=\"form-group\"></fieldset></form>");
+	var form = $("<form action=\"#\" class=\"quiz-question\" data-question=\"" + index + "\"><fieldset class=\"form-group\"></fieldset></form>");
     var warning = $("<div class=\"answer alert alert-danger\"></div>");
 	var count = $(".current");
 	var prev = $(".btn.prev");
@@ -304,7 +307,7 @@ var storeScore = function(score) {
 
 
 /**
- * Loads a new quiz form from AJAX into a modal, add interactivity
+ * Loads a new quiz form from AJAX into a modal, adds interactivity
  */
 var newQuiz = function() {
     $(".add-quiz").click( function(e) {
