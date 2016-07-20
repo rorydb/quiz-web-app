@@ -175,9 +175,6 @@ var checkAnswer = function() {
     var chosenAnswer = $("input[name=choice]:checked").val();
     var correctAnswer = currentQuestion.correctAnswer;
 
-    console.log(currentQuestion);
-    console.log(chosenAnswer);
-
     currentQuestion.setLastAnswer(chosenAnswer);
 
     return chosenAnswer === correctAnswer;
@@ -295,7 +292,6 @@ var storeScore = function(score) {
 
     if (localStorage) {
         localStorage.setItem("recentScores", JSON.stringify(recentScores));
-        console.log(localStorage.getItem("recentScores"));
     }
 
     if (listOfScores.length > 5) {
