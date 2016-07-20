@@ -48,21 +48,12 @@ var loadQuizzesToSelection = function() {
 
         } else {
             var quiz1 = new Quiz("Default Quiz", []);
-            var quiz2 = new Quiz("Second Quiz", []);
-            var quiz3 = new Quiz("Third Quiz", []);
-            var quiz4 = new Quiz("Fourth Quiz", []);
-            var quiz5 = new Quiz("Fifth Quiz", []);
-            var quiz6 = new Quiz("Sixth Quiz", []);
-            var quiz7 = new Quiz("Seventh Quiz", []);
-            var quiz8 = new Quiz("Eigth Quiz", []);
-            var quiz9 = new Quiz("Ninth Quiz", []);
-            var quiz10 = new Quiz("Tenth Quiz", []);
 
             quiz1.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
             quiz1.addQuestion(new Question("This is the second question?",["si","no","not sure"],"si"));
             quiz1.addQuestion(new Question("What is the air-speed velocity of an unladen swallow?",["african","european","african or european?","i don't know that"],"african or european?"));
 
-            allQuizzes.push(quiz1, quiz2, quiz3, quiz4, quiz5, quiz6, quiz7, quiz8, quiz9, quiz10);
+            allQuizzes.push(quiz1);
 
             /**
              * THIS IS TEMPORARY
@@ -332,6 +323,19 @@ var newQuiz = function() {
                     e.preventDefault();
                 });
 
+                $("#quiz-name").focusout( function() {
+                    if ($(this).val().length === 0) {
+                        $("<div class=\"alert alert-danger\">Please enter a quiz name.</div>")
+                            .insertAfter($(this))
+                            .fadeIn(200);
+                    } else {
+                        $(this).siblings(".alert")
+                            .fadeOut(200, function() {
+                                $(this).remove();
+                            });
+                    }
+                });
+
                 $("form").on("click", ".add-answers", function() {
                     var question = $(this).closest("formset");
                     var questionNumber = question.attr("data-question");
@@ -418,8 +422,7 @@ var newQuiz = function() {
                     backgroundSize();
                 });
 
-                $(".btn.exit").click( function(e) {
-                    e.preventDefault();
+                $(".btn.exit").click( function() {å
                     $(".modal-block, .modal-background").fadeOut( function() {
                         $(this).remove();
                     });
