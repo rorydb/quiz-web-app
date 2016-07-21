@@ -578,7 +578,7 @@ function newQuiz() {
                     newFormset
                         .hide()
                         .insertAfter(lastQuestion)
-                        .fadeIn(1000);
+                        .fadeIn(200);
                     $("<hr />").insertAfter(lastQuestion);
 
                     backgroundSize();
