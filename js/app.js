@@ -149,7 +149,7 @@ function loadQuizzesToSelection() {
         /**
          * Creating quiz listings
          */
-        for (var i = allQuizzes.length - 1; i >= 0; i--) {
+        for (var i = 0; i < allQuizzes.length; i++) {
             createQuizListing(allQuizzes[i], i);
         }
 
@@ -477,10 +477,7 @@ function newQuiz() {
                     .prependTo($("body"))
                     .fadeIn();
 
-                $(window).resize(backgroundSize);
-
-
-                quizForm.on("click", ".btn", function(e) {
+                container.on("click", ".btn", function(e) {
                     e.preventDefault();
                 });
 
@@ -501,7 +498,7 @@ function newQuiz() {
                     }
                 });
 
-                quizForm.on("click", ".add-answers", function() {
+                container.on("click", ".add-answers", function() {
                     var question = $(this).closest("formset");
                     var questionNumber = question.attr("data-question");
                     var lastAnswerNumber = parseInt(question.find(".question").last().attr("data-answer"));
@@ -523,7 +520,7 @@ function newQuiz() {
                     backgroundSize();
                 });
 
-                $(".modal-block").on("click", ".add-question", function() {
+                container.on("click", ".add-question", function() {
                     var lastQuestion = $(".modal-block").find("formset").last();
                     var newQuestionNumber = parseInt(lastQuestion.attr("data-question")) + 1;
                     
@@ -594,6 +591,7 @@ function newQuiz() {
                 });
 
                 $(".btn.save").click( function() {
+                    console.log("enter");
                     var warning = $("<div class=\"alert alert-danger\"></div>");
                     var quizName = $("#quiz-name").val();
                     var questions = $(".new.quiz-question");
@@ -642,9 +640,10 @@ function newQuiz() {
                         localStorage.setItem("quizzes",JSON.stringify(allQuizzes));
                     }
 
+                    createQuizListing(allQuizzes[allQuizzes.length - 1], allQuizzes.length - 1);
+
                     $(".modal-block, .modal-background").fadeOut( function() {
                         $(this).remove();
-                        createQuizListing(allQuizzes[allQuizzes.length - 1], allQuizzes[allQuizzes.length - 1]);
                     });
                 });
 
