@@ -1,26 +1,28 @@
 var allQuizzes = [];
 var activeQuiz = '';
-
 var recentScores = [];
+
 
 /**
  *	Sets initial name of active quiz
  */
-var setQuizName = function() {
+function setQuizName() {
 	$(".quiz-name").text(activeQuiz.name);
-};
+}
+
 
 /**
  *  Updates length of current quiz.
  */
-var quizLength = function() {
+function quizLength() {
     $('.total').text(activeQuiz.questions.length);
-};
+}
+
 
 /**
  * Loads the five most recent scores from a user.
  */
-var loadRecentScores = function() {
+function loadRecentScores() {
     if (localStorage) {
         if (localStorage.getItem("recentScores")) {
             recentScores = JSON.parse(localStorage.getItem("recentScores"));
@@ -45,89 +47,108 @@ var loadRecentScores = function() {
             return false;
         }
     }
-};
+}
+
 
 /**
- * Loads quizzes from localStorage or loads default quizzes
+ * Loads quizzes either from local storage or loads default quizzes
  */
-var loadQuizzesToSelection = function() {
+function loadQuizzesToSelection() {
     if (localStorage) {
+        // User has previously created quizzes, get these from local storage and turn them into the appropriate objects
+        if (localStorage.getItem("quizzes")) {
+            var previousQuizzes = JSON.parse(localStorage.getItem("quizzes"));
+
+            previousQuizzes.forEach( function(quiz){
+                var questions = [];
+
+                // Question objects
+                quiz.questions.forEach( function(question) {
+                   questions.push(new Question(question.question, question.choices, question.correctAnswer));
+                });
+
+                // Adding Quiz object to allQuizzes array
+                allQuizzes.push(new Quiz(quiz.name, questions));
+            });
+        } else {
+            loadDefault();
+        }
 
         /**
-         * TODO: Turn quiz JSON data into actual objects
+         * Creating quiz listings
          */
+        for (var i = allQuizzes.length - 1; i >= 0; i--) {
+            createQuizListing(allQuizzes[i], i);
+        }
 
-        // if (localStorage.getItem("quizzes")) {
-        //     allQuizzes = JSON.parse(localStorage.getItem("quizzes"));
-        //     /**
-        //      * THIS IS TEMPORARY
-        //      */
-        //     activeQuiz = allQuizzes[0];
-
-        //     for (var i = allQuizzes.length - 1; i >= 0; i--) {
-        //         var title = allQuizzes[i].name;
-        //         var quizList = $("#quizzes").find("li");
-        //         var display = i >= 4 ? "display: none" : "display: block";
-        //         var hiddenClass = i >= 4 ? "hidden" : ""
-        //         var newQuiz = $("<li class=\"list-group-item " + hiddenClass + "\" style=\"" + display + "\"><a href=\"#\">" + title + "</a></li>");
-
-        //         if (i === 4) {
-        //             $("<li class=\"list-group-item list-group-item-info more\"><a href=\"#\">More</a></li>").insertAfter(quizList.last());
-        //         }
-
-        //         newQuiz.insertAfter(quizList.first());
-        //     }
-
-        //     setQuizName();
-        //     quizLength();            
-
-        //     $("body").on("click", "li.more a", function(e) {
-        //         e.preventDefault();
-        //         $("#quizzes").find("li.hidden").slideToggle(200);
-        //         $(this).text() === "More" ? $(this).text("Less") : $(this).text("More");
-        //     });            
-
-        // } else {
-            var quiz1 = new Quiz("Default Quiz", []);
-
-            quiz1.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
-            quiz1.addQuestion(new Question("This is the second question?",["si","no","not sure"],"si"));
-            quiz1.addQuestion(new Question("What is the air-speed velocity of an unladen swallow?",["african","european","african or european?","i don't know that"],"african or european?"));
-
-            allQuizzes.push(quiz1);
-
-            /**
-             * THIS IS TEMPORARY
-             */
-            activeQuiz = allQuizzes[0];
-
-            for (var i = allQuizzes.length - 1; i >= 0; i--) {
-                var title = allQuizzes[i].name;
-                var quizList = $("#quizzes").find("li");
-                var display = i >= 4 ? "display: none" : "display: block";
-                var hiddenClass = i >= 4 ? "hidden" : ""
-                var newQuiz = $("<li class=\"list-group-item " + hiddenClass + "\" style=\"" + display + "\"><a href=\"#\">" + title + "</a></li>");
-
-                if (i === 4) {
-                    $("<li class=\"list-group-item list-group-item-info more\"><a href=\"#\">More</a></li>").insertAfter(quizList.last());
-                }
-
-                newQuiz.insertAfter(quizList.first());
-            }
-
-            setQuizName();
-            quizLength();            
-
-            $("body").on("click", "li.more a", function(e) {
-                e.preventDefault();
-                $("#quizzes").find("li.hidden").slideToggle(200);
-                $(this).text() === "More" ? $(this).text("Less") : $(this).text("More");
-            });
-        // }
+    } else {
+        loadDefault();
     }
-};
 
-var previousQuestion = function() {
+    $("body").on("click", "li.more a", function(e) {
+        e.preventDefault();
+        $("#quizzes").find("li.hidden").slideToggle(200);
+        $(this).text() === "More" ? $(this).text("Less") : $(this).text("More");
+    });
+
+
+    function loadDefault() {
+        var quiz1 = new Quiz("Default Quiz", []);
+        quiz1.addQuestion(new Question("This is the first question?",["yes","no"],"yes"));
+
+        quiz1.addQuestion(new Question("This is the second question?",["si","no","not sure"],"si"));
+        quiz1.addQuestion(new Question("What is the air-speed velocity of an unladen swallow?",["african","european","african or european?","i don't know that"],"african or european?"));
+        allQuizzes.push(quiz1);
+
+        activeQuiz = allQuizzes[0];
+    }
+}
+
+
+/**
+ * Creates a quiz in the markup
+ * @param {Quiz} quizObj - listing to be added
+ * @param {number} index - Index of object in allQuizzes[]
+ */
+function createQuizListing (quizObj, index) {
+    var title = quizObj.name;
+    var quizList = $("#quizzes").find("li");
+    var display = quizList.length >= 5 ? "display: none" : "display: block";
+    var hiddenClass = quizList.length >= 5 ? "hidden" : "";
+    var newQuiz = $("<li class=\"list-group-item " + hiddenClass + "\" style=\"" + display + "\"><a href=\"#\" data-index=\"" + index + "\">" + title + "</a></li>");
+
+    if (quizList.length === 5) {
+        $("<li class=\"list-group-item list-group-item-info more\"><a href=\"#\">More</a></li>").insertAfter(quizList.last());
+    }
+
+    newQuiz.insertAfter(quizList.not(".more").last());
+}
+
+
+/**
+ * Loads a quiz from the allQuizzes array
+ * @param {number} index - index of quiz to be loaded in allQuizzes[]
+ */
+function loadQuiz(index) {
+    activeQuiz = allQuizzes[index];
+
+    var header = $(".card-header");
+    var	body = $(".card-block");
+    var count = $(".current");
+
+    $(".btn.next").prop("disabled",false);
+
+    body.fadeTo(400, 0, function() {
+        $(this)
+            .html("<h5>Let's get started on: " + activeQuiz.name + "</h5>")
+            .fadeTo(400, 1);
+    });
+
+    setQuizName();
+    quizLength();
+}
+
+function previousQuestion() {
 	$(".btn.prev").click( function() {
 		var currentQuestion = $("form").attr("data-question");
         if (currentQuestion === activeQuiz.questions.length !== 0) {
@@ -136,9 +157,10 @@ var previousQuestion = function() {
             return false;
         }
 	});
-};
+}
 
-var nextQuestion = function() {
+
+function nextQuestion() {
 	$(".btn.next").click( function() {
 		var currentQuestion = parseInt($("form.quiz-question").attr("data-question"));
         var warning = $(".answer.alert");
@@ -187,25 +209,27 @@ var nextQuestion = function() {
         }
 
 	});
-};
+}
+
 
 /**
  * Checks to see if an answer has been selected
  * @returns {boolean} - whether an answer has been chosen
  */
-var questionAnswered = function() {
+function questionAnswered() {
     var answers = $("input[name=choice]");
 
     if (answers.length > 0) {
         return answers.is(":checked");
     }
-};
+}
+
 
 /**
  * Checks if an answer is correct.
  * @returns {boolean}
  */
-var checkAnswer = function() {
+function checkAnswer() {
     var currentQuestion = activeQuiz.questions[parseInt($("form.quiz-question").attr("data-question"))];
     var chosenAnswer = $("input[name=choice]:checked").val();
     var correctAnswer = currentQuestion.correctAnswer;
@@ -213,14 +237,14 @@ var checkAnswer = function() {
     currentQuestion.setLastAnswer(chosenAnswer);
 
     return chosenAnswer === correctAnswer;
-};
+}
 
 
 /**
  * Displays the final quiz score
  * @param score - score calculated from user answers
  */
-var displayResults = function(score) {
+function displayResults(score) {
     var header = $(".card-header");
     var	body = $(".card-block");
     var prev = $(".btn.prev");
@@ -244,14 +268,15 @@ var displayResults = function(score) {
             .html("<h5>Your score: " + score + "%</h5>")
             .fadeTo(400, 1);
     });
-};
+}
+
 
 /**
  *	Populates a question into the markup
  *	@param questionObj {Question} - the question to be posed
  *	@param index {number} - index in the array of activeQuiz
  */
-var loadQuestion = function(questionObj, index) {
+function loadQuestion(questionObj, index) {
 	var header = $(".card-header");
 	var	body = $(".card-block");
 	var form =
@@ -259,7 +284,7 @@ var loadQuestion = function(questionObj, index) {
         .attr({
             "action": "#",
             "class": "quiz-question",
-            "data-question": index,
+            "data-question": index
         })
         .append(
             $("<fieldset></fieldset>").attr({"class": "form-group"})
@@ -313,13 +338,14 @@ var loadQuestion = function(questionObj, index) {
     });
 
 	count.text(index+1);
-};
+}
+
 
 /**
  * Stores a score in an array + local storage and displays it in the markup with percent correct answers and date
  * @param score - final score
  */
-var storeScore = function(score) {
+function storeScore(score) {
     var time = new Date();
     var quizResult = {name: activeQuiz.name, score: score, time: time.toLocaleDateString() + " " + time.toLocaleTimeString()};
     var newRecord =
@@ -351,13 +377,13 @@ var storeScore = function(score) {
     }
 
     newRecord.insertAfter(listOfScores.first());
-};
+}
 
 
 /**
  * Loads a new quiz form from AJAX into a modal, adds interactivity
  */
-var newQuiz = function() {
+function newQuiz() {
     $(".add-quiz").click( function(e) {
         e.preventDefault();
 
@@ -378,6 +404,9 @@ var newQuiz = function() {
                 container.add(background)
                     .prependTo($("body"))
                     .fadeIn();
+
+                $(window).resize(backgroundSize);
+
 
                 quizForm.on("click", ".btn", function(e) {
                     e.preventDefault();
@@ -540,6 +569,11 @@ var newQuiz = function() {
                     if (localStorage) {
                         localStorage.setItem("quizzes",JSON.stringify(allQuizzes));
                     }
+
+                    $(".modal-block, .modal-background").fadeOut( function() {
+                        $(this).remove();
+                        createQuizListing(allQuizzes[allQuizzes.length - 1], allQuizzes[allQuizzes.length - 1]);
+                    });
                 });
 
 
@@ -550,10 +584,10 @@ var newQuiz = function() {
             }
         })
     });
-};
+}
+
 
 $(document).ready(function(){
-    $('.btn.next').prop("disabled", false);
     loadQuizzesToSelection();
     loadRecentScores();
     previousQuestion();
@@ -565,5 +599,11 @@ $(document).ready(function(){
 
     $("body").on("click", "input[name=choice]", function () {
         checkAnswer();
+    });
+
+    $("#quizzes").on("click", "a", function() {
+        if ($(this).hasClass("add-quiz")) { return; }
+        else if ($(this).parent().hasClass("more")) { return; }
+        loadQuiz(parseInt($(this).attr("data-index")));
     });
 });
